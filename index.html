@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bible Bowl — ACE Regional 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9963A;
+    --gold-light: #E8B85A;
+    --parchment: #F5EDD8;
+    --parchment-dark: #E8D9BC;
+    --ink: #1A140A;
+    --ink-mid: #3D2B12;
+    --red: #8B2020;
+    --green: #1A5C2A;
+    --shadow: rgba(0,0,0,0.4);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Crimson Pro', Georgia, serif;
+    background: var(--ink);
+    color: var(--parchment);
+    min-height: 100vh;
+    background-image: 
+      radial-gradient(ellipse at 20% 20%, rgba(201,150,58,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(139,32,32,0.06) 0%, transparent 50%);
+  }
+
+  header {
+    text-align: center;
+    padding: 2.5rem 1rem 1.5rem;
+    border-bottom: 1px solid rgba(201,150,58,0.3);
+    position: relative;
+  }
+
+  header::before {
+    content: '✦ ✦ ✦';
+    display: block;
+    color: var(--gold);
+    font-size: 0.75rem;
+    letter-spacing: 0.5em;
+    margin-bottom: 0.75rem;
+    opacity: 0.7;
+  }
+
+  h1 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.6rem, 5vw, 2.8rem);
+    font-weight: 900;
+    color: var(--gold-light);
+    letter-spacing: 0.08em;
+    text-shadow: 0 2px 20px rgba(201,150,58,0.4);
+    line-height: 1.1;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+    color: rgba(245,237,216,0.55);
+    margin-top: 0.4rem;
+    font-style: italic;
+    letter-spacing: 0.05em;
+  }
+
+  nav {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    flex-wrap: wrap;
+  }
+
+  nav button {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    padding: 0.5rem 1.1rem;
+    border: 1px solid rgba(201,150,58,0.4);
+    background: transparent;
+    color: var(--gold);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  nav button:hover, nav button.active {
+    background: var(--gold);
+    color: var(--ink);
+    border-color: var(--gold);
+  }
+
+  main { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+
+  /* ── STUDY VIEW ── */
+  .books-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1rem;
+  }
+
+  .book-card {
+    background: rgba(245,237,216,0.04);
+    border: 1px solid rgba(201,150,58,0.2);
+    padding: 1.25rem 1.4rem;
+    cursor: pointer;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .book-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--gold);
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+
+  .book-card:hover { background: rgba(245,237,216,0.08); border-color: rgba(201,150,58,0.5); }
+  .book-card:hover::before { opacity: 1; }
+  .book-card.open { background: rgba(245,237,216,0.07); border-color: rgba(201,150,58,0.6); }
+  .book-card.open::before { opacity: 1; }
+
+  .book-name {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gold-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .book-name .chevron { font-size: 0.7rem; transition: transform 0.25s; opacity: 0.6; }
+  .book-card.open .chevron { transform: rotate(180deg); }
+
+  .book-meta {
+    font-size: 0.82rem;
+    color: rgba(245,237,216,0.45);
+    margin-top: 0.25rem;
+    font-style: italic;
+  }
+
+  .book-detail {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+  }
+
+  .book-card.open .book-detail { max-height: 600px; }
+
+  .book-detail-inner {
+    padding-top: 1rem;
+    border-top: 1px solid rgba(201,150,58,0.15);
+    margin-top: 1rem;
+  }
+
+  .detail-section { margin-bottom: 0.9rem; }
+  .detail-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 0.3rem;
+    opacity: 0.8;
+  }
+
+  .detail-text {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: rgba(245,237,216,0.82);
+  }
+
+  .key-facts { display: flex; flex-direction: column; gap: 0.3rem; }
+  .key-fact {
+    font-size: 0.85rem;
+    color: rgba(245,237,216,0.75);
+    padding-left: 1rem;
+    position: relative;
+    line-height: 1.4;
+  }
+  .key-fact::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--gold);
+    opacity: 0.7;
+  }
+
+  /* ── QUIZ VIEW ── */
+  .quiz-container { max-width: 600px; margin: 0 auto; }
+
+  .quiz-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .score-badge {
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    color: var(--gold);
+    background: rgba(201,150,58,0.1);
+    border: 1px solid rgba(201,150,58,0.3);
+    padding: 0.35rem 0.8rem;
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 2px;
+    background: rgba(245,237,216,0.1);
+    margin-bottom: 2rem;
+    position: relative;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--gold);
+    transition: width 0.4s ease;
+  }
+
+  .question-card {
+    background: rgba(245,237,216,0.04);
+    border: 1px solid rgba(201,150,58,0.25);
+    padding: 2rem;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  .q-category {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    opacity: 0.7;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  .q-text {
+    font-size: 1.15rem;
+    line-height: 1.65;
+    color: var(--parchment);
+    margin-bottom: 1.75rem;
+  }
+
+  .options { display: flex; flex-direction: column; gap: 0.6rem; }
+
+  .option-btn {
+    text-align: left;
+    padding: 0.8rem 1.1rem;
+    border: 1px solid rgba(245,237,216,0.15);
+    background: rgba(245,237,216,0.03);
+    color: rgba(245,237,216,0.85);
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.98rem;
+    cursor: pointer;
+    transition: all 0.18s;
+    line-height: 1.4;
+  }
+
+  .option-btn:hover:not(:disabled) {
+    border-color: rgba(201,150,58,0.5);
+    background: rgba(201,150,58,0.08);
+    color: var(--parchment);
+  }
+
+  .option-btn.correct {
+    border-color: #3A8B50;
+    background: rgba(26,92,42,0.25);
+    color: #8BD4A0;
+  }
+
+  .option-btn.wrong {
+    border-color: #8B2020;
+    background: rgba(139,32,32,0.2);
+    color: #E08080;
+  }
+
+  .option-btn:disabled { cursor: default; }
+
+  .feedback {
+    margin-top: 1.25rem;
+    padding: 1rem 1.25rem;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    animation: fadeIn 0.25s ease;
+  }
+
+  .feedback.correct-fb { border-left: 3px solid #3A8B50; background: rgba(26,92,42,0.15); color: #A8DDB8; }
+  .feedback.wrong-fb { border-left: 3px solid var(--red); background: rgba(139,32,32,0.15); color: #E8B0B0; }
+
+  .next-btn {
+    margin-top: 1.5rem;
+    width: 100%;
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.9rem;
+    background: var(--gold);
+    color: var(--ink);
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-weight: 600;
+  }
+
+  .next-btn:hover { background: var(--gold-light); }
+
+  /* Results */
+  .results {
+    text-align: center;
+    padding: 3rem 1rem;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .results-score {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(3rem, 10vw, 5rem);
+    color: var(--gold-light);
+    font-weight: 900;
+    text-shadow: 0 0 40px rgba(201,150,58,0.4);
+    line-height: 1;
+  }
+
+  .results-label {
+    font-size: 1rem;
+    color: rgba(245,237,216,0.5);
+    margin-top: 0.5rem;
+    font-style: italic;
+  }
+
+  .results-msg {
+    margin: 1.5rem auto;
+    max-width: 380px;
+    font-size: 1.05rem;
+    line-height: 1.65;
+    color: rgba(245,237,216,0.8);
+  }
+
+  .restart-btn {
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.85rem 2.5rem;
+    background: transparent;
+    color: var(--gold);
+    border: 1px solid var(--gold);
+    cursor: pointer;
+    transition: all 0.2s;
+    margin: 0.4rem;
+  }
+
+  .restart-btn:hover { background: var(--gold); color: var(--ink); }
+  .restart-btn.primary { background: var(--gold); color: var(--ink); }
+  .restart-btn.primary:hover { background: var(--gold-light); }
+
+  /* Section heading */
+  .section-heading {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    opacity: 0.65;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+
+  .divider {
+    width: 60px;
+    height: 1px;
+    background: rgba(201,150,58,0.3);
+    margin: 0 auto 1.5rem;
+  }
+
+  .quiz-mode-selector {
+    display: flex;
+    gap: 0.6rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .mode-btn {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid rgba(201,150,58,0.35);
+    background: transparent;
+    color: rgba(201,150,58,0.7);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .mode-btn.active, .mode-btn:hover { background: rgba(201,150,58,0.15); color: var(--gold); border-color: var(--gold); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>BIBLE BOWL</h1>
+  <div class="subtitle">ACE Regional Convention · Study Guide & Quiz</div>
+</header>
+
+<nav>
+  <button class="active" onclick="showView('study')">Study</button>
+  <button onclick="showView('quiz')">Quiz Me</button>
+</nav>
+
+<main id="app"></main>
+
+<script>
+const BOOKS = [
+  {
+    name: "Deuteronomy",
+    testament: "Old Testament · Pentateuch",
+    author: "Moses",
+    chapters: 34,
+    summary: "Moses' final speeches to Israel before they enter Canaan. He recounts the wilderness journey, restates the Law (including the Ten Commandments), and calls Israel to covenant faithfulness. Contains the Shema ('Hear, O Israel') and ends with Moses' death on Mount Nebo.",
+    keyFacts: [
+      "Name means 'Second Law' — a restatement of the Law",
+      "Written as Moses' farewell addresses to Israel",
+      "Contains the Shema (Deut. 6:4–5), the greatest commandment",
+      "Moses dies at the end — buried by God, location unknown",
+      "Joshua is appointed successor to Moses",
+      "Key theme: Choose life — obedience brings blessing, disobedience brings curse",
+      "Setting: Plains of Moab, east of the Jordan River"
+    ]
+  },
+  {
+    name: "Nehemiah",
+    testament: "Old Testament · History",
+    author: "Nehemiah (with Ezra contributing portions)",
+    chapters: 13,
+    summary: "Nehemiah, cupbearer to the Persian king Artaxerxes, receives news that Jerusalem's walls are in ruin. He receives permission to return and leads the rebuilding of Jerusalem's walls in just 52 days despite fierce opposition. The book closes with covenant renewal and reforms.",
+    keyFacts: [
+      "Author was cupbearer to King Artaxerxes of Persia",
+      "Walls of Jerusalem rebuilt in 52 days — a remarkable feat",
+      "Major opponents: Sanballat, Tobiah, and Geshem the Arab",
+      "Ezra reads the Law publicly to the people (ch. 8)",
+      "Key themes: prayer, perseverance, leadership, and reform",
+      "Nehemiah's famous prayer is in chapter 1",
+      "Part of the post-exile restoration alongside Ezra"
+    ]
+  },
+  {
+    name: "Song of Solomon",
+    testament: "Old Testament · Poetry / Wisdom",
+    author: "Solomon",
+    chapters: 8,
+    summary: "A lyrical poem celebrating love and marriage between a bride (the Shulamite woman) and her beloved. Rich in nature imagery, it affirms the beauty of romantic love within covenant. Traditionally read at Passover. Many also read it allegorically as depicting God's love for Israel / Christ's love for the Church.",
+    keyFacts: [
+      "Also called the 'Song of Songs' — a Hebrew superlative meaning the greatest song",
+      "Author is Solomon; written in a poetic, dramatic form",
+      "Main speakers: the bride (Shulamite), the bridegroom, and a chorus of daughters of Jerusalem",
+      "Famous verse: 'I am my beloved's and my beloved is mine' (6:3)",
+      "Key themes: beauty of marital love, desire, devotion, and intimacy",
+      "Set in spring — filled with imagery of gardens, vineyards, and nature",
+      "Often interpreted allegorically: God's love for His people"
+    ]
+  },
+  {
+    name: "I Chronicles",
+    testament: "Old Testament · History",
+    author: "Traditionally Ezra",
+    chapters: 29,
+    summary: "A retelling of Israel's history from Adam through the reign of David, written for the post-exilic community returning from Babylon. Emphasizes David's preparations for the Temple and his role in establishing worship. Genealogies fill the first nine chapters.",
+    keyFacts: [
+      "Likely written by Ezra for the returned exiles",
+      "Opens with nine chapters of genealogies (Adam to post-exile)",
+      "Focuses heavily on David's role in planning the Temple",
+      "Does NOT include David's sin with Bathsheba — focuses on his godly legacy",
+      "Ends with David's charge to Solomon and his death",
+      "Key theme: proper worship and the Levitical priesthood",
+      "Counterpart to II Chronicles which covers Solomon onward"
+    ]
+  },
+  {
+    name: "Malachi",
+    testament: "Old Testament · Minor Prophets",
+    author: "Malachi",
+    chapters: 4,
+    summary: "The last book of the Old Testament. Written after the return from exile, Malachi rebukes a spiritually apathetic Israel for corrupt priests, unfaithful marriages, robbing God in tithes, and doubting His justice. It ends with a promise of Elijah's return before 'the great and dreadful day of the Lord.'",
+    keyFacts: [
+      "Last book of the Old Testament — ends the Hebrew prophetic canon",
+      "Name 'Malachi' means 'my messenger'",
+      "Written as a series of disputations (God argues His case against Israel)",
+      "Famous passage: 'Will a man rob God? Yet you rob me in tithes...' (3:8)",
+      "Promises Elijah will come before the Day of the Lord — fulfilled in John the Baptist",
+      "400 years of prophetic silence follow this book",
+      "Key themes: priestly corruption, divorce, tithing, faithfulness"
+    ]
+  },
+  {
+    name: "Isaiah",
+    testament: "Old Testament · Major Prophets",
+    author: "Isaiah",
+    chapters: 66,
+    summary: "One of the most quoted OT books in the New Testament. Isaiah prophesied during the reigns of four Judean kings. The book contains devastating judgment against Israel and the nations, but also soaring promises of hope — including the Servant Songs which point to Jesus Christ as the Suffering Servant.",
+    keyFacts: [
+      "Called the 'Fifth Gospel' because of its Messianic prophecies",
+      "Prophesied during reigns of Uzziah, Jotham, Ahaz, and Hezekiah",
+      "Chapter 53 — the Suffering Servant — is one of the most quoted OT prophecies about Jesus",
+      "Isaiah 6 contains his famous calling vision: 'Here am I, send me'",
+      "Two major sections: chapters 1–39 (judgment) and 40–66 (comfort/hope)",
+      "Famous verse: 'They that wait upon the LORD shall renew their strength' (40:31)",
+      "66 chapters mirror the Bible's 66 books in many thematic structures"
+    ]
+  },
+  {
+    name: "Acts",
+    testament: "New Testament · History",
+    author: "Luke",
+    chapters: 28,
+    summary: "The history of the early Church from the ascension of Jesus through Paul's imprisonment in Rome. Covers Pentecost, the spread of the Gospel from Jerusalem to Judea, Samaria, and the ends of the earth. Acts follows the apostles Peter and Paul as primary figures.",
+    keyFacts: [
+      "Written by Luke as a sequel to the Gospel of Luke",
+      "Full title: 'The Acts of the Apostles'",
+      "Opens with Jesus' ascension and the promise of the Holy Spirit",
+      "Pentecost (Acts 2) — the Holy Spirit falls; 3,000 saved",
+      "Paul's three missionary journeys are detailed in Acts",
+      "Paul's conversion on the Damascus road is in Acts 9",
+      "Ends with Paul under house arrest in Rome — the Gospel has reached the capital",
+      "Key verse: Acts 1:8 — 'You will be my witnesses... to the ends of the earth'"
+    ]
+  },
+  {
+    name: "II Corinthians",
+    testament: "New Testament · Epistle",
+    author: "Paul",
+    chapters: 13,
+    summary: "Paul's most personal letter — a passionate defense of his apostleship and a call for reconciliation with the Corinthian church. He shares openly about his sufferings, the 'thorn in the flesh,' and the glory of ministry. Contains the famous 'cheerful giver' passage and his vision of the third heaven.",
+    keyFacts: [
+      "Written by Paul while on his third missionary journey",
+      "Likely written from Macedonia, around AD 55–57",
+      "Most autobiographical of Paul's letters",
+      "Contains the 'thorn in the flesh' passage — 'My grace is sufficient for you' (12:9)",
+      "Famous giving passage: 'God loves a cheerful giver' (9:7)",
+      "Paul describes being caught up to the third heaven (ch. 12)",
+      "Key theme: strength in weakness, true vs. false apostleship",
+      "Concludes with the Trinitarian benediction (13:14)"
+    ]
+  },
+  {
+    name: "I Timothy",
+    testament: "New Testament · Pastoral Epistle",
+    author: "Paul",
+    chapters: 6,
+    summary: "A letter from Paul to his young protégé Timothy, who was pastoring the church at Ephesus. Paul gives practical instructions on church leadership, qualifications for elders and deacons, dealing with false teachers, and how Timothy should conduct himself as a minister of the Gospel.",
+    keyFacts: [
+      "One of three 'Pastoral Epistles' (I Tim, II Tim, Titus)",
+      "Written to Timothy, Paul's 'son in the faith' pastoring at Ephesus",
+      "Lists qualifications for elders (overseers) and deacons (ch. 3)",
+      "Famous verse: 'For the love of money is a root of all kinds of evil' (6:10)",
+      "Also: 'Fight the good fight of faith' (6:12)",
+      "Addresses the role of women in the church (ch. 2)",
+      "Key themes: sound doctrine, church order, and pastoral faithfulness"
+    ]
+  },
+  {
+    name: "II Peter",
+    testament: "New Testament · General Epistle",
+    author: "Peter (Simon Peter, Apostle)",
+    chapters: 3,
+    summary: "Peter's final letter, written shortly before his death. He urges believers to grow in grace, warns extensively against false teachers who deny the Lord, and defends the truth of Christ's return. Chapter 3 contains the famous 'day of the Lord' passage about the earth being destroyed by fire.",
+    keyFacts: [
+      "Written by Peter shortly before his martyrdom",
+      "Addresses believers scattered throughout the Roman world",
+      "Famous passage: 'Add to your faith virtue; to virtue knowledge...' (1:5–7)",
+      "Warns strongly against false prophets who exploit believers",
+      "Defends the Second Coming against scoffers: 'With the Lord, a day is like a thousand years' (3:8)",
+      "References Paul's letters as 'scripture' (3:16) — remarkable early canon affirmation",
+      "Key themes: spiritual growth, false teachers, and Christ's return"
+    ]
+  },
+  {
+    name: "Jude",
+    testament: "New Testament · General Epistle",
+    author: "Jude (brother of Jesus and James)",
+    chapters: 1,
+    summary: "A short but fierce letter urging believers to 'contend earnestly for the faith.' Jude warns against ungodly men who have crept into the church and uses dramatic examples (fallen angels, Sodom and Gomorrah, Cain, Korah's rebellion) to illustrate God's judgment on apostasy. Ends with one of the most beautiful doxologies in Scripture.",
+    keyFacts: [
+      "Author is Jude, the half-brother of Jesus (also brother of James)",
+      "Shortest book with only 1 chapter (25 verses)",
+      "Key verse: 'Contend earnestly for the faith once delivered to the saints' (v. 3)",
+      "References the apocryphal Book of Enoch and the assumption of Moses",
+      "Uses OT examples: fallen angels, Sodom, Cain, Balaam, Korah",
+      "Ends with a famous doxology: 'To him who is able to keep you from falling...' (vv. 24–25)",
+      "Key themes: apostasy, false teachers, and perseverance of true believers"
+    ]
+  }
+];
+
+const QUESTIONS = [
+  // Authors
+  { q: "Who wrote the book of Deuteronomy?", a: "Moses", opts: ["Moses", "Joshua", "Aaron", "Ezra"], cat: "Authorship", book: "Deuteronomy", explanation: "Moses authored Deuteronomy. It contains his final speeches to Israel before his death on Mount Nebo." },
+  { q: "Who wrote the book of Nehemiah?", a: "Nehemiah (with Ezra contributing portions)", opts: ["Nehemiah", "Ezra", "Daniel", "Mordecai"], a2: "Nehemiah", cat: "Authorship", book: "Nehemiah", explanation: "Nehemiah himself wrote this book, with some scholars noting Ezra contributed portions. It is a personal memoir of his leadership." },
+  { q: "Who wrote the Song of Solomon?", a: "Solomon", opts: ["Solomon", "David", "Asaph", "Isaiah"], cat: "Authorship", book: "Song of Solomon", explanation: "Solomon authored this book. It is the greatest of his 1,005 songs mentioned in scripture." },
+  { q: "Who is the traditional author of I Chronicles?", a: "Ezra", opts: ["Ezra", "Moses", "Samuel", "Nehemiah"], cat: "Authorship", book: "I Chronicles", explanation: "Tradition holds that Ezra compiled and authored Chronicles for the post-exilic community returning from Babylon." },
+  { q: "Who wrote the book of Malachi?", a: "Malachi", opts: ["Malachi", "Zechariah", "Haggai", "Obadiah"], cat: "Authorship", book: "Malachi", explanation: "Malachi authored this book. His name means 'my messenger,' fitting as the last voice before 400 years of prophetic silence." },
+  { q: "Who wrote the book of Isaiah?", a: "Isaiah", opts: ["Isaiah", "Jeremiah", "Ezekiel", "Amos"], cat: "Authorship", book: "Isaiah", explanation: "Isaiah, who prophesied during the reigns of four Judean kings, wrote this book. He is often called the 'evangelical prophet.'" },
+  { q: "Who wrote the book of Acts?", a: "Luke", opts: ["Luke", "Paul", "Peter", "John"], cat: "Authorship", book: "Acts", explanation: "Luke, the physician, wrote Acts as a sequel to his Gospel. Both are addressed to Theophilus." },
+  { q: "Who wrote II Corinthians?", a: "Paul", opts: ["Paul", "Luke", "Peter", "Barnabas"], cat: "Authorship", book: "II Corinthians", explanation: "Paul wrote II Corinthians, his most personal letter, likely from Macedonia around AD 55–57." },
+  { q: "Who wrote I Timothy?", a: "Paul", opts: ["Paul", "Timothy", "Silas", "Barnabas"], cat: "Authorship", book: "I Timothy", explanation: "Paul wrote I Timothy to his young protégé Timothy who was pastoring the church in Ephesus." },
+  { q: "Who wrote II Peter?", a: "Peter", opts: ["Peter", "Paul", "John", "James"], cat: "Authorship", book: "II Peter", explanation: "Simon Peter, the apostle, wrote this letter shortly before his martyrdom under Nero." },
+  { q: "Who wrote the book of Jude?", a: "Jude", opts: ["Jude", "John", "James", "Paul"], cat: "Authorship", book: "Jude", explanation: "Jude, the half-brother of Jesus (and brother of James), wrote this letter. He humbly identifies himself as a servant, not a brother, of Christ." },
+  // Content / Key Facts
+  { q: "What famous prayer command is found in Deuteronomy 6:4–5?", a: "The Shema ('Hear, O Israel')", opts: ["The Shema ('Hear, O Israel')", "The Lord's Prayer", "The Aaronic Blessing", "The Ten Commandments"], cat: "Key Content", book: "Deuteronomy", explanation: "The Shema — 'Hear, O Israel: the LORD our God, the LORD is one' — is the central confession of Judaism and is found in Deuteronomy 6:4." },
+  { q: "In Nehemiah, how long did it take to rebuild Jerusalem's walls?", a: "52 days", opts: ["52 days", "7 days", "100 days", "40 days"], cat: "Key Content", book: "Nehemiah", explanation: "Despite fierce opposition from Sanballat, Tobiah, and Geshem, Nehemiah and the people rebuilt Jerusalem's walls in just 52 days." },
+  { q: "What is the other name for the Song of Solomon?", a: "Song of Songs", opts: ["Song of Songs", "Psalms of Love", "Song of Zion", "Canticles of David"], cat: "Key Content", book: "Song of Solomon", explanation: "It is also called 'Song of Songs,' a Hebrew superlative meaning this is the greatest or most excellent of songs." },
+  { q: "In Malachi, what does God accuse Israel of robbing Him with?", a: "Tithes and offerings", opts: ["Tithes and offerings", "False worship", "Stolen land", "Corrupt priests"], cat: "Key Content", book: "Malachi", explanation: "'Will a man rob God? Yet you rob me. But you ask, How do we rob you? In tithes and offerings.' (Malachi 3:8)" },
+  { q: "What is the chapter and subject of Isaiah's famous calling vision?", a: "Chapter 6 — 'Here am I, send me'", opts: ["Chapter 6 — 'Here am I, send me'", "Chapter 1 — The sinful nation", "Chapter 40 — Comfort my people", "Chapter 53 — The Suffering Servant"], cat: "Key Content", book: "Isaiah", explanation: "Isaiah chapter 6 describes his vision of the Lord high and exalted, the seraphim, and his commissioning: 'Here am I! Send me.'" },
+  { q: "Acts 1:8 says the disciples will be witnesses to what extent?", a: "To the ends of the earth", opts: ["To the ends of the earth", "To all of Israel", "To Rome and beyond", "To every nation in Asia"], cat: "Key Content", book: "Acts", explanation: "Acts 1:8 — 'You will receive power when the Holy Spirit comes on you; and you will be my witnesses in Jerusalem... and to the ends of the earth.'" },
+  { q: "In II Corinthians, what did God say to Paul about his thorn in the flesh?", a: "My grace is sufficient for you", opts: ["My grace is sufficient for you", "I will remove it in due time", "Bear it and be silent", "Pray three more times"], cat: "Key Content", book: "II Corinthians", explanation: "'My grace is sufficient for you, for my power is made perfect in weakness.' (II Corinthians 12:9) — the answer to Paul's three requests for relief." },
+  { q: "What famous phrase about money is found in I Timothy 6:10?", a: "The love of money is a root of all kinds of evil", opts: ["The love of money is a root of all kinds of evil", "Money is the root of all evil", "Gain is godliness with contentment", "Rich men shall not enter the kingdom"], cat: "Key Content", book: "I Timothy", explanation: "I Timothy 6:10 — 'For the love of money is a root of all kinds of evil.' Note: it's the LOVE of money, not money itself, and it's 'a root,' not 'the root.'" },
+  { q: "What remarkable claim does II Peter 3:16 make about Paul's writings?", a: "It calls them scripture", opts: ["It calls them scripture", "It warns they are hard to understand", "It corrects Paul's teaching", "It calls Paul the greatest apostle"], cat: "Key Content", book: "II Peter", explanation: "II Peter 3:16 refers to Paul's letters as 'scripture' — a remarkable affirmation of the NT canon written by a fellow apostle." },
+  { q: "What is the key exhortation of Jude verse 3?", a: "Contend earnestly for the faith", opts: ["Contend earnestly for the faith", "Keep yourselves in God's love", "Build yourselves up in faith", "Beware of false prophets"], cat: "Key Content", book: "Jude", explanation: "'Beloved... I found it necessary to write to you appealing that you contend earnestly for the faith that was once for all delivered to the saints.' (Jude 3)" },
+  // Testament / Category
+  { q: "Which of these Bible Bowl books is a Major Prophet?", a: "Isaiah", opts: ["Isaiah", "Malachi", "Nehemiah", "Jude"], cat: "Classification", book: "Isaiah", explanation: "Isaiah is one of five Major Prophets (Isaiah, Jeremiah, Lamentations, Ezekiel, Daniel). Malachi is a Minor Prophet." },
+  { q: "Which of these books belongs to the Pentateuch (first five books of Moses)?", a: "Deuteronomy", opts: ["Deuteronomy", "Nehemiah", "I Chronicles", "Malachi"], cat: "Classification", book: "Deuteronomy", explanation: "Deuteronomy is the 5th and final book of the Pentateuch — the Torah written by Moses." },
+  { q: "Which Bible Bowl book is a Pastoral Epistle?", a: "I Timothy", opts: ["I Timothy", "II Corinthians", "II Peter", "Jude"], cat: "Classification", book: "I Timothy", explanation: "I Timothy is one of the three Pastoral Epistles (I Timothy, II Timothy, Titus) written by Paul to church leaders." },
+  { q: "How many chapters does the book of Jude have?", a: "1", opts: ["1", "3", "5", "13"], cat: "Key Content", book: "Jude", explanation: "Jude has only 1 chapter — 25 verses — making it one of the shortest books in the New Testament." },
+  { q: "In what city was Timothy pastoring when Paul wrote I Timothy?", a: "Ephesus", opts: ["Ephesus", "Corinth", "Antioch", "Philippi"], cat: "Key Content", book: "I Timothy", explanation: "Paul left Timothy in Ephesus (I Timothy 1:3) to command certain people not to teach false doctrines and to oversee the church there." },
+  { q: "Which book ends with Moses' death?", a: "Deuteronomy", opts: ["Deuteronomy", "Numbers", "I Chronicles", "Joshua"], cat: "Key Content", book: "Deuteronomy", explanation: "Deuteronomy 34 records Moses' death on Mount Nebo, his burial by God, and the transition of leadership to Joshua." },
+  { q: "Who are Sanballat and Tobiah in the book of Nehemiah?", a: "Opponents who opposed the wall-rebuilding", opts: ["Opponents who opposed the wall-rebuilding", "Priests who helped Nehemiah", "Gatekeepers of Jerusalem", "Persian officials who supported Nehemiah"], cat: "Key Content", book: "Nehemiah", explanation: "Sanballat the Horonite and Tobiah the Ammonite were leading opponents who mocked and plotted against Nehemiah's efforts to rebuild Jerusalem's walls." },
+  { q: "Isaiah chapter 53 is famous for describing what?", a: "The Suffering Servant — a prophecy of Jesus", opts: ["The Suffering Servant — a prophecy of Jesus", "The fall of Babylon", "The Valley of Dry Bones", "The Day of the Lord"], cat: "Key Content", book: "Isaiah", explanation: "Isaiah 53 describes the Suffering Servant who was wounded for our transgressions — one of the most precise Messianic prophecies in the OT." },
+  { q: "What event occurs in Acts chapter 2?", a: "Pentecost — the Holy Spirit falls and 3,000 are saved", opts: ["Pentecost — the Holy Spirit falls and 3,000 are saved", "Paul's conversion on Damascus road", "The stoning of Stephen", "Jesus' ascension into heaven"], cat: "Key Content", book: "Acts", explanation: "Acts 2 — Pentecost. The Holy Spirit falls on the 120 in the upper room, Peter preaches, and about 3,000 people are added to the church that day." },
+];
+
+let view = 'study';
+let quizMode = 'all'; // 'all', 'authorship', 'content', 'classification'
+let quizQuestions = [];
+let currentQ = 0;
+let score = 0;
+let answered = false;
+let openCard = null;
+
+function showView(v) {
+  view = v;
+  document.querySelectorAll('nav button').forEach((b,i) => b.classList.toggle('active', (i===0&&v==='study')||(i===1&&v==='quiz')));
+  render();
+}
+
+function startQuiz() {
+  let pool = [...QUESTIONS];
+  if (quizMode === 'authorship') pool = pool.filter(q => q.cat === 'Authorship');
+  if (quizMode === 'content') pool = pool.filter(q => q.cat === 'Key Content');
+  if (quizMode === 'classification') pool = pool.filter(q => q.cat === 'Classification');
+  quizQuestions = pool.sort(() => Math.random() - 0.5);
+  currentQ = 0; score = 0; answered = false;
+  render();
+}
+
+function answer(opt) {
+  if (answered) return;
+  answered = true;
+  const q = quizQuestions[currentQ];
+  const correct = opt === q.a || opt === q.a2;
+  if (correct) score++;
+  render(opt, correct);
+}
+
+function next() {
+  currentQ++;
+  answered = false;
+  render();
+}
+
+function toggleCard(i) {
+  openCard = openCard === i ? null : i;
+  render();
+}
+
+function render(selectedOpt, wasCorrect) {
+  const app = document.getElementById('app');
+
+  if (view === 'study') {
+    app.innerHTML = `
+      <p class="section-heading">11 Books · Click to Expand</p>
+      <div class="divider"></div>
+      <div class="books-grid">
+        ${BOOKS.map((b,i) => `
+          <div class="book-card ${openCard===i?'open':''}" onclick="toggleCard(${i})">
+            <div class="book-name">
+              ${b.name}
+              <span class="chevron">▼</span>
+            </div>
+            <div class="book-meta">${b.testament}</div>
+            <div class="book-detail">
+              <div class="book-detail-inner">
+                <div class="detail-section">
+                  <div class="detail-label">Author</div>
+                  <div class="detail-text">${b.author}</div>
+                </div>
+                <div class="detail-section">
+                  <div class="detail-label">Overview</div>
+                  <div class="detail-text">${b.summary}</div>
+                </div>
+                <div class="detail-section">
+                  <div class="detail-label">Key Facts to Know</div>
+                  <div class="key-facts">
+                    ${b.keyFacts.map(f => `<div class="key-fact">${f}</div>`).join('')}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    return;
+  }
+
+  // QUIZ view
+  if (!quizQuestions.length) {
+    app.innerHTML = `
+      <div class="quiz-container">
+        <p class="section-heading">Choose a Focus</p>
+        <div class="divider"></div>
+        <div class="quiz-mode-selector">
+          ${[['all','All Questions'],['authorship','Authors Only'],['content','Key Content'],['classification','Classification']].map(([k,l]) =>
+            `<button class="mode-btn ${quizMode===k?'active':''}" onclick="quizMode='${k}';document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">${l}</button>`
+          ).join('')}
+        </div>
+        <button class="next-btn" onclick="startQuiz()">Begin Quiz</button>
+      </div>
+    `;
+    return;
+  }
+
+  if (currentQ >= quizQuestions.length) {
+    const pct = Math.round(score/quizQuestions.length*100);
+    const msg = pct===100 ? "Perfect score! You're ready for competition." : pct>=80 ? "Excellent work — nearly there! A few more review passes and you'll have it." : pct>=60 ? "Good foundation. Focus on the books where you missed questions." : "Keep studying! Use the Study tab to review and try again.";
+    app.innerHTML = `
+      <div class="quiz-container results">
+        <div class="results-score">${score}/${quizQuestions.length}</div>
+        <div class="results-label">${pct}% Correct</div>
+        <div class="results-msg">${msg}</div>
+        <br>
+        <button class="restart-btn primary" onclick="startQuiz()">Retake Quiz</button>
+        <button class="restart-btn" onclick="quizQuestions=[];render()">Change Focus</button>
+        <button class="restart-btn" onclick="showView('study')">Review Books</button>
+      </div>
+    `;
+    return;
+  }
+
+  const q = quizQuestions[currentQ];
+  const opts = [...q.opts].sort(() => Math.random() - 0.5);
+  // Re-sort consistently per question index
+  const shuffled = q.opts;
+
+  app.innerHTML = `
+    <div class="quiz-container">
+      <div class="quiz-header">
+        <span class="score-badge">Score: ${score} / ${currentQ}</span>
+        <span class="score-badge">Q ${currentQ+1} of ${quizQuestions.length}</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width:${(currentQ/quizQuestions.length)*100}%"></div>
+      </div>
+      <div class="question-card">
+        <div class="q-category">${q.cat} · ${q.book}</div>
+        <div class="q-text">${q.q}</div>
+        <div class="options" id="opts">
+          ${shuffled.map(opt => `
+            <button class="option-btn ${answered ? (opt===q.a||opt===q.a2?'correct':opt===selectedOpt?'wrong':'') : ''}"
+              onclick="${answered?'':'answer(\''+opt.replace(/'/g,"\\'")+'\')'}"
+              ${answered?'disabled':''}>
+              ${opt}
+            </button>
+          `).join('')}
+        </div>
+        ${answered ? `
+          <div class="feedback ${wasCorrect?'correct-fb':'wrong-fb'}">
+            ${wasCorrect ? '✓ Correct! ' : '✗ Not quite. '}${q.explanation}
+          </div>
+          <button class="next-btn" onclick="next()">${currentQ+1<quizQuestions.length?'Next Question →':'See Results'}</button>
+        ` : ''}
+      </div>
+    </div>
+  `;
+}
+
+render();
+</script>
+</body>
+</html>
